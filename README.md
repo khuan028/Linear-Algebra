@@ -3,6 +3,8 @@ This Linear Algebra repository contains useful classes for creating and manipula
 
 A majority of the vector class was developed by Mat Leonard (2015). Please thank him for his GitHub gist here: https://gist.github.com/mcleonard/5351452
 
+I made a few improvements upon Mat's code, including cross product and matrix multiplication using the * operator.
+
 
 ## Features:
 1. Vector addition and scalar multiplication
