@@ -29,14 +29,35 @@ c = cross_product(a, b)
 d = dot_product(a, b)
 ```
 
-4. Matrix multiplication
+4. Matrix-vector multiplication
 ```python
 mat = [[1,2,3],[-1,0,1],[3,4,5]]
 a = mat * Vector(1,2,3)
 ```
 
-5. Rotation
+
+5. Matrix-matrix multiplication
+```python
+a = [[1,2,3],[-1,0,1],[3,4,5]]
+b = [[1,5,0],[1,1,1],[12,17,96]]
+c = 4.1 * a * b
+```
+
+6. Vector rotation
 ```python
 a = (3,4)
 b = a.rotated(0.5 * math.pi)
+```
+
+7. Matrix transpose
+```python
+a = [[1,2,3],[-1,0,1],[3,4,5]]
+b = a.transpose()
+```
+
+8. Matrix row and column getters
+```python
+a = [[1,2,3],[-1,0,1],[3,4,5]]
+u = a.get_row(1)
+v = a.get_col(0)
 ```
