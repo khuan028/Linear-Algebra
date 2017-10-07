@@ -24,10 +24,11 @@ THE SOFTWARE.
 """
 
 import math
+from collections import Sequence
 import numbers
+from numbers import Real, Number
 
 class Vector(object):
-
     def __init__(self, *args):
         """ Create a vector, example: v = Vector(1,2) """
         if len(args) == 0:
@@ -70,7 +71,7 @@ class Vector(object):
                 raise ValueError("Rotation matrix must be square and same dimensions as vector")
             return self.matrix_mult(matrix)
 
-    def _rotated2D(self, theta):
+    def _rotated2D(self, theta: Real):
         """ Rotate this vector by theta in degrees.
 
             Returns a new vector.
@@ -111,21 +112,34 @@ class Vector(object):
         """
         if type(other) == type(self):
             return self.inner(other)
-        elif type(other) in numbers.Number:
+        elif isinstance(other, numbers.Number):
             product = tuple(a * other for a in self)
             return Vector(*product)
+        elif isinstance(other, Sequence) and isinstance(other[0], Sequence):
+            raise TypeError("Matrix must be multiplied on the left")
+        else:
+            raise TypeError("Incompatible vector multiplication")
 
     def __rmul__(self, other):
-        """ Called if 4*self for instance """
-        return self.__mul__(other)
+        """ Performs scalar/matrix multiplication on the left
+            (e.g. scalar * vec)
+            (e.g. matrix * vec)
+        """
+        if isinstance(other, Number):
+            return self.__mul__(other)
+        elif isinstance(other, Sequence) and isinstance(other[0], Sequence):
+            return self.matrix_mult(other)
+        else:
+            raise TypeError("A vector can only be multiplied by a scalar, matrix, or vector")
 
-    def __div__(self, other):
-        if type(other) == type(1) or type(other) == type(1.0):
+    def __div__(self, other: Number):
+        """ Returns a vector scaled by 1 / other"""
+        if isinstance(other, Number):
             divided = tuple(a / other for a in self)
             return Vector(*divided)
 
     def __add__(self, other):
-        """ Returns the vector addition of self and other """
+        """ Returns the vector sum of self and other """
         added = tuple(a + b for a, b in zip(self, other))
         return Vector(*added)
 
@@ -146,4 +160,35 @@ class Vector(object):
     def __repr__(self):
         return str(self.values)
 
+    def __str__(self):
+        return str(self.values)
 
+
+def cross_product(u: Vector, v: Vector):
+    """
+    Calculates the vector product of two vectors
+
+    :rtype: numbers.Number
+    :param u: first vector
+    :param v: second vector
+    :return: cross product of u and v
+    """
+    if all(len(x) == 3 for x in (u, v)):
+        a1 = u[1] * v[2] - u[2] * v[1]
+        a2 = u[2] * v[0] - u[0] * v[2]
+        a3 = u[0] * v[1] - u[1] * v[0]
+        return Vector(a1, a2, a3)
+    else:
+        raise ValueError("Vectors must be three-dimensional")
+
+
+def dot_product(u: Vector, v: Vector):
+    """
+    Calculates the dot product of two vectors
+
+    :rtype: numbers.Number
+    :param u: first vector
+    :param v: second vector
+    :return: dot product of u and v
+    """
+    return sum(a * b for a, b in zip(u, v))
