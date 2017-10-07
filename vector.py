@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 
 import math
-
+import numbers
 
 class Vector(object):
 
@@ -48,13 +48,13 @@ class Vector(object):
         else:
             return arg_in_deg
 
-    def normalize(self):
+    def normalized(self):
         """ Returns a normalized unit vector """
         norm = self.norm()
         normed = tuple(comp / norm for comp in self)
         return Vector(*normed)
 
-    def rotate(self, *args):
+    def rotated(self, *args):
         """ Rotate this vector. If passed a number, assumes this is a 
             2D vector and rotates by the passed value in degrees.  Otherwise,
             assumes the passed value is a list acting as a matrix which rotates the vector.
@@ -63,14 +63,14 @@ class Vector(object):
             # So, if rotate is passed an int or a float...
             if len(self) != 2:
                 raise ValueError("Rotation axis not defined for greater than 2D vector")
-            return self._rotate2D(*args)
+            return self._rotated2D(*args)
         elif len(args) == 1:
             matrix = args[0]
             if not all(len(row) == len(v) for row in matrix) or not len(matrix) == len(self):
                 raise ValueError("Rotation matrix must be square and same dimensions as vector")
             return self.matrix_mult(matrix)
 
-    def _rotate2D(self, theta):
+    def _rotated2D(self, theta):
         """ Rotate this vector by theta in degrees.
 
             Returns a new vector.
@@ -111,7 +111,7 @@ class Vector(object):
         """
         if type(other) == type(self):
             return self.inner(other)
-        elif type(other) == type(1) or type(other) == type(1.0):
+        elif type(other) in numbers.Number:
             product = tuple(a * other for a in self)
             return Vector(*product)
 
