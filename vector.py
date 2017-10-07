@@ -24,9 +24,10 @@ THE SOFTWARE.
 """
 
 import math
+import matrix
 from collections import Sequence
-import numbers
-from numbers import Real, Number
+
+scalarTypes = (int, float)
 
 class Vector(object):
     def __init__(self, *args):
@@ -35,6 +36,10 @@ class Vector(object):
             self.values = (0, 0)
         else:
             self.values = args
+
+    @property
+    def get_tuple(self):
+        return self.values
 
     def norm(self):
         """ Returns the norm (length, magnitude) of the vector """
@@ -49,29 +54,29 @@ class Vector(object):
         else:
             return arg_in_deg
 
-    def normalized(self):
+    def normalize(self):
         """ Returns a normalized unit vector """
         norm = self.norm()
         normed = tuple(comp / norm for comp in self)
         return Vector(*normed)
 
-    def rotated(self, *args):
+    def rotate(self, *args):
         """ Rotate this vector. If passed a number, assumes this is a 
             2D vector and rotates by the passed value in degrees.  Otherwise,
             assumes the passed value is a list acting as a matrix which rotates the vector.
         """
-        if len(args) == 1 and type(args[0]) == type(1) or type(args[0]) == type(1.):
+        if len(args) == 1 and isinstance(args[0], scalarTypes):
             # So, if rotate is passed an int or a float...
             if len(self) != 2:
                 raise ValueError("Rotation axis not defined for greater than 2D vector")
-            return self._rotated2D(*args)
+            return self._rotate2D(*args)
         elif len(args) == 1:
-            matrix = args[0]
-            if not all(len(row) == len(v) for row in matrix) or not len(matrix) == len(self):
+            mat = args[0]
+            if not all(len(row) == len(mat) for row in mat) or not len(mat) == len(self):
                 raise ValueError("Rotation matrix must be square and same dimensions as vector")
-            return self.matrix_mult(matrix)
+            return self.matrix_mult(mat)
 
-    def _rotated2D(self, theta: Real):
+    def _rotate2D(self, theta):
         """ Rotate this vector by theta in degrees.
 
             Returns a new vector.
@@ -83,7 +88,7 @@ class Vector(object):
         x, y = dc * x - ds * y, ds * x + dc * y
         return Vector(x, y)
 
-    def matrix_mult(self, matrix):
+    def matrix_mult(self, mat):
         """ Multiply this vector by a matrix.  Assuming matrix is a list of lists.
 
             Example:
@@ -91,12 +96,15 @@ class Vector(object):
             Vector(1,2,3).matrix_mult(mat) ->  (14, 2, 26)
 
         """
-        if not all(len(row) == len(self) for row in matrix):
+        if isinstance(mat, matrix.Matrix):
+            return self.matrix_mult(matrix.Matrix.get_list)
+
+        if not all(len(row) == len(self) for row in mat):
             raise ValueError('Matrix must match vector dimensions')
 
             # Grab a row from the matrix, make it a Vector, take the dot product,
         # and store it as the first component
-        product = tuple(Vector(*row) * self for row in matrix)
+        product = tuple(Vector(*row) * self for row in mat)
 
         return Vector(*product)
 
@@ -112,10 +120,10 @@ class Vector(object):
         """
         if type(other) == type(self):
             return self.inner(other)
-        elif isinstance(other, numbers.Number):
+        elif isinstance(other, scalarTypes):
             product = tuple(a * other for a in self)
             return Vector(*product)
-        elif isinstance(other, Sequence) and isinstance(other[0], Sequence):
+        elif (isinstance(other, Sequence) and isinstance(other[0], Sequence)) or isinstance(other, matrix.Matrix):
             raise TypeError("Matrix must be multiplied on the left")
         else:
             raise TypeError("Incompatible vector multiplication")
@@ -125,18 +133,17 @@ class Vector(object):
             (e.g. scalar * vec)
             (e.g. matrix * vec)
         """
-        if isinstance(other, Number):
+        if isinstance(other, scalarTypes):
             return self.__mul__(other)
         elif isinstance(other, Sequence) and isinstance(other[0], Sequence):
             return self.matrix_mult(other)
         else:
             raise TypeError("A vector can only be multiplied by a scalar, matrix, or vector")
 
-    def __div__(self, other: Number):
+    def __div__(self, other):
         """ Returns a vector scaled by 1 / other"""
-        if isinstance(other, Number):
-            divided = tuple(a / other for a in self)
-            return Vector(*divided)
+        divided = tuple(a / other for a in self)
+        return Vector(*divided)
 
     def __add__(self, other):
         """ Returns the vector sum of self and other """
@@ -168,7 +175,7 @@ def cross_product(u: Vector, v: Vector):
     """
     Calculates the vector product of two vectors
 
-    :rtype: numbers.Number
+    :rtype: Vector
     :param u: first vector
     :param v: second vector
     :return: cross product of u and v
@@ -186,7 +193,7 @@ def dot_product(u: Vector, v: Vector):
     """
     Calculates the dot product of two vectors
 
-    :rtype: numbers.Number
+    :rtype: float
     :param u: first vector
     :param v: second vector
     :return: dot product of u and v
