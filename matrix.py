@@ -243,11 +243,14 @@ def inverse(mat):
     :param mat: input matrix
     :return: inverse matrix
     """
-    coMat = cofactors(mat)
-    adj = coMat.transpose()
     det = determinant(mat)
-    invMat = (1 / det) * adj
-    return invMat
+    if det == 0:
+        raise ZeroDivisionError("This matrix has no inverse because the determinant is 0")
+    else:
+        coMat = cofactors(mat)
+        adj = coMat.transpose()
+        invMat = (1 / det) * adj
+        return invMat
 
 def determinant(mat) -> float:
     """
