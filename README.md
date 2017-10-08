@@ -1,4 +1,4 @@
-# LinearAlgebra
+# Linear Algebra
 This Linear Algebra repository contains useful classes for creating and manipulating vectors and matrices.
 
 A majority of the vector class was developed by Mat Leonard (2015). Please thank him for his GitHub gist here: https://gist.github.com/mcleonard/5351452
