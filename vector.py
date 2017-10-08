@@ -29,6 +29,7 @@ from collections import Sequence
 
 scalarTypes = (int, float)
 
+
 class Vector(object):
     def __init__(self, *args):
         """ Create a vector, example: v = Vector(1,2) """
@@ -140,7 +141,7 @@ class Vector(object):
         else:
             raise TypeError("A vector can only be multiplied by a scalar, matrix, or vector")
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         """ Returns a vector scaled by 1 / other"""
         divided = tuple(a / other for a in self)
         return Vector(*divided)
@@ -187,7 +188,6 @@ def cross_product(u: Vector, v: Vector):
         return Vector(a1, a2, a3)
     else:
         raise ValueError("Vectors must be three-dimensional")
-
 
 def dot_product(u: Vector, v: Vector):
     """
