@@ -110,9 +110,22 @@ class Vector(object):
         return Vector(*product)
 
     def inner(self, other):
-        """ Returns the dot product (inner product) of self and other vector
         """
-        return sum(a * b for a, b in zip(self, other))
+        Returns the dot product (inner product) of self and other vector
+
+        :param other: other vector
+        :return: inner product
+        """
+        return float(sum(a * b for a, b in zip(self, other)))
+
+    def cross(self, other):
+        """
+        Returns the cross product (vector product) of self and other vector
+
+        :param other: other vector
+        :return: cross product
+        """
+        return cross_product(self, other)
 
     def __mul__(self, other):
         """ Returns the dot product of self and other if multiplied

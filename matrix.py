@@ -29,7 +29,12 @@ scalarTypes = (int, float)
 
 class Matrix(object):
     def __init__(self, args):
-        self.values = [list(row) for row in args]
+        if len(args) == 0:
+            self.values = [[]]
+        elif all((len(x) == len(args[0]) for x in args)):
+            self.values = [list(row) for row in args]
+        else:
+            raise ValueError("Could not create Matrix. Matrix must be rectangular.")
 
     @property
     def get_list(self):
